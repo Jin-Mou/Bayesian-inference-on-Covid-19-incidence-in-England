@@ -1,0 +1,26 @@
+#### Jin Mou  s2103110
+
+
+model{
+  for (i in 3:N){ ## loop over the data
+    # the prior for the log of the number of infections per day, x
+    x[i] ~ dnorm(2*x[i-1] - x[i-2], tau)
+    # the number of infections per day, n
+    n[i] <- exp(x[i])
+    # the prior for the expected number of deaths, m
+    m[i] <- B[i,1:i] %*% n[1:i]
+    # the distribution of observed number of deaths, y
+    y[i] ~ dpois(m[i])
+
+  }
+  # priors
+  x[1] ~ dnorm(0, 0.01)
+  n[1] <- exp(x[1])
+  m[1] <- B[1, 1] %*% n[1]
+  y[1] ~ dpois(m[1])
+  x[2] ~ dnorm(x[1], tau)
+  n[2] <- exp(x[2])
+  m[2] <- B[2, 1:2] %*% n[1:2]
+  y[2] ~ dpois(m[2])
+  tau ~ dgamma(4, 0.04)
+}
